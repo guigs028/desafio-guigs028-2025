@@ -105,12 +105,8 @@ class AbrigoAnimais {
     const p1Pode = this.pessoaPodeAdotar(brinquedosPessoa1, nomeAnimal, adotadosP1, animais);
     const p2Pode = this.pessoaPodeAdotar(brinquedosPessoa2, nomeAnimal, adotadosP2, animais);
 
-    if (nomeAnimal === "Loco") {
-      return this.aplicarRegraLoco(p1Pode, p2Pode);
-    } else {
-      //se ambos podem adotar, fica no abrigo
-      return this.aplicarRegraExclusividade(p1Pode, p2Pode);
-    }
+    //se ambos podem adotar, fica no abrigo
+    return this.aplicarRegraExclusividade(p1Pode, p2Pode);
   }
 
   pessoaPodeAdotar(brinquedos, nomeAnimal, adotados, animais) {
@@ -127,7 +123,7 @@ class AbrigoAnimais {
       return this.verificarRegraLoco(listaBrinquedos, animal, adotados);
     }
     
-    // Verificar regra dos gatos
+    //verificar regra dos gatos
     if (animal.tipo === "gato") {
       const podeAdotarGato = this.verificarRegraGatos(animal, adotados, animais);
       if (!podeAdotarGato) return false;
@@ -159,13 +155,13 @@ class AbrigoAnimais {
     for (const nomeAnimalAdotado of adotados) {
       const animalAdotado = animais[nomeAnimalAdotado];
       
-      // Gato não pode ser adotado se já há qualquer animal com brinquedos em comum
+      //gato não pode ser adotado se já há qualquer animal com brinquedos em comum
       const brinquedosComuns = gatoAtual.favoritos.filter(brinquedo => 
         animalAdotado.favoritos.includes(brinquedo)
       );
       
       if (brinquedosComuns.length > 0) {
-        return false; // Não pode adotar pois há brinquedos em comum com qualquer animal já adotado
+        return false; //não pode adotar pois há brinquedos em comum com qualquer animal já adotado
       }
     }
     return true;
@@ -173,12 +169,6 @@ class AbrigoAnimais {
 
   aplicarRegraExclusividade(p1Pode, p2Pode) {
     if (p1Pode && p2Pode) return "abrigo";
-    if (p1Pode) return "pessoa 1";
-    if (p2Pode) return "pessoa 2";
-    return "abrigo";
-  }
-
-  aplicarRegraLoco(p1Pode, p2Pode) {
     if (p1Pode) return "pessoa 1";
     if (p2Pode) return "pessoa 2";
     return "abrigo";
