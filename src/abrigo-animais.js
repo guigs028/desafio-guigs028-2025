@@ -123,19 +123,23 @@ class AbrigoAnimais {
       return this.verificarRegraLoco(listaBrinquedos, animal, adotados);
     }
     
-    //verificar regra dos gatos
-    if (animal.tipo === "gato") {
-      const podeAdotarGato = this.verificarRegraGatos(animal, adotados, animais);
-      if (!podeAdotarGato) return false;
-    }
+    //verifica regra dos gatos - sempre verifica se tem conflito com gatos já adotados
+    const podeAdotarComGatos = this.verificarRegraGatos(animal, adotados, animais);
+    if (!podeAdotarComGatos) return false;
     
     return this.verificarOrdemBrinquedos(listaBrinquedos, animal);
   }
 
   verificarRegraLoco(listaBrinquedos, animal, adotados) {
     const temCompanhia = adotados.length > 0;
-    const temTodosBrinquedos = animal.favoritos.every(fav => listaBrinquedos.includes(fav));
-    return temCompanhia && temTodosBrinquedos;
+    
+    if (temCompanhia) {
+      //se tem companhia, não liga para ordem (apenas precisa ter todos os brinquedos)
+      return animal.favoritos.every(fav => listaBrinquedos.includes(fav));
+    } else {
+      //se não tem companhia, liga para ordem (segue regra normal)
+      return this.verificarOrdemBrinquedos(listaBrinquedos, animal);
+    }
   }
 
   verificarOrdemBrinquedos(listaBrinquedos, animal) {
@@ -151,17 +155,23 @@ class AbrigoAnimais {
     return false;
   }
 
-  verificarRegraGatos(gatoAtual, adotados, animais) {
+  verificarRegraGatos(animalAtual, adotados, animais) {
     for (const nomeAnimalAdotado of adotados) {
       const animalAdotado = animais[nomeAnimalAdotado];
       
-      //gato não pode ser adotado se já há qualquer animal com brinquedos em comum
-      const brinquedosComuns = gatoAtual.favoritos.filter(brinquedo => 
-        animalAdotado.favoritos.includes(brinquedo)
-      );
+      //verifica conflito se um dos dois for gato
+      const animalAtualEhGato = animalAtual.tipo === "gato";
+      const animalAdotadoEhGato = animalAdotado.tipo === "gato";
       
-      if (brinquedosComuns.length > 0) {
-        return false; //não pode adotar pois há brinquedos em comum com qualquer animal já adotado
+      if (animalAtualEhGato || animalAdotadoEhGato) {
+        //gato não pode ser adotado se tiver conflito de brinquedos
+        const brinquedosComuns = animalAtual.favoritos.filter(brinquedo => 
+          animalAdotado.favoritos.includes(brinquedo)
+        );
+        
+        if (brinquedosComuns.length > 0) {
+          return false; //não pode adotar pois tem brinquedos em comum
+        }
       }
     }
     return true;
